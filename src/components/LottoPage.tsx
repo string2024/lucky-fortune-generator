@@ -2,7 +2,8 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getTodayFortune, generateLottoNumbers, generateBonusNumbers, getNumberColor } from "@/lib/fortune";
 import { saveNumbers, shareNumbers } from "@/lib/storage";
-import { Share2, Download, Gift } from "lucide-react";
+import { getFreeBonusCount, useFreeBonusToken } from "@/lib/attendance";
+import { Share2, Download, Gift, Ticket } from "lucide-react";
 import { toast } from "sonner";
 
 const LottoBall = ({ num, delay }: { num: number; delay: number }) => (
