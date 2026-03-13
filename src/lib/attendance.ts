@@ -58,9 +58,26 @@ export function checkIn(): { streak: number; alreadyChecked: boolean } {
   data.dates.push(today);
   data.streak = newStreak;
   data.lastDate = today;
+
+  // 7일 달성 시 무료 보너스 토큰 지급
+  let rewardGranted = false;
+  if (newStreak > 0 && newStreak % 7 === 0) {
+    grantFreeBonus();
+    rewardGranted = true;
+  }
+
+  // 뱃지 체크
+  const newBadges: string[] = [];
+  for (const badge of BADGES) {
+    if (data.dates.length >= badge.requirement && !data.badges.includes(badge.name)) {
+      data.badges.push(badge.name);
+      newBadges.push(badge.name);
+    }
+  }
+
   saveData(data);
 
-  return { streak: newStreak, alreadyChecked: false };
+  return { streak: newStreak, alreadyChecked: false, rewardGranted, newBadges };
 }
 
 export function getAttendanceInfo(): { streak: number; totalDays: number; checkedToday: boolean } {
