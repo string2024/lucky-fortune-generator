@@ -29,6 +29,15 @@ const LottoPage = () => {
 
   const handleReveal = () => setRevealed(true);
 
+  const handleUseFreeBonus = () => {
+    const used = useFreeBonusToken();
+    if (used) {
+      setFreeBonusCount(getFreeBonusCount());
+      setBonusNumbers(generateBonusNumbers(fortunes));
+      toast.success("🎁 무료 보너스 번호가 생성되었어요!");
+    }
+  };
+
   const handleRewardAd = () => {
     setShowRewardAd(true);
     setTimeout(() => {
