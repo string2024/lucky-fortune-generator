@@ -80,7 +80,7 @@ export function checkIn(): { streak: number; alreadyChecked: boolean } {
   return { streak: newStreak, alreadyChecked: false, rewardGranted, newBadges };
 }
 
-export function getAttendanceInfo(): { streak: number; totalDays: number; checkedToday: boolean } {
+export function getAttendanceInfo() {
   const data = loadData();
   const today = getTodayStr();
   const yesterday = getYesterdayStr();
@@ -94,5 +94,24 @@ export function getAttendanceInfo(): { streak: number; totalDays: number; checke
     streak,
     totalDays: data.dates.length,
     checkedToday: data.lastDate === today,
+    badges: data.badges || [],
+    earnedBadges: BADGES.filter(b => (data.badges || []).includes(b.name)),
   };
+}
+
+// 무료 보너스 토큰 관리
+export function grantFreeBonus() {
+  const count = getFreeBonusCount();
+  localStorage.setItem(FREE_BONUS_KEY, String(count + 1));
+}
+
+export function getFreeBonusCount(): number {
+  return parseInt(localStorage.getItem(FREE_BONUS_KEY) || "0", 10);
+}
+
+export function useFreeBonusToken(): boolean {
+  const count = getFreeBonusCount();
+  if (count <= 0) return false;
+  localStorage.setItem(FREE_BONUS_KEY, String(count - 1));
+  return true;
 }
