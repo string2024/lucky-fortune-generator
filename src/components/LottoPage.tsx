@@ -25,7 +25,6 @@ const LottoPage = () => {
   const [showRewardAd, setShowRewardAd] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [freeBonusCount, setFreeBonusCount] = useState(getFreeBonusCount());
-  const [revealed, setRevealed] = useState(false);
 
   const handleReveal = () => setRevealed(true);
 
