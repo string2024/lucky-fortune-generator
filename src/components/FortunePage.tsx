@@ -1,10 +1,17 @@
 import { motion } from "framer-motion";
 import { getTodayFortune, getTotalScore, getOverallMessage } from "@/lib/fortune";
+import { getAttendanceInfo } from "@/lib/attendance";
+import { Ticket, Calendar, ArrowRight } from "lucide-react";
 
-const FortunePage = () => {
+interface FortunePageProps {
+  onNavigate?: (tab: "lotto" | "attendance") => void;
+}
+
+const FortunePage = ({ onNavigate }: FortunePageProps) => {
   const fortunes = getTodayFortune();
   const total = getTotalScore(fortunes);
   const overall = getOverallMessage(total);
+  const attendance = getAttendanceInfo();
 
   return (
     <div className="px-5 pt-6">
@@ -12,6 +19,27 @@ const FortunePage = () => {
       <p className="text-sm text-muted-foreground mb-5">
         {new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" })}
       </p>
+
+      {/* Attendance nudge */}
+      {!attendance.checkedToday && (
+        <motion.button
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          onClick={() => onNavigate?.("attendance")}
+          className="w-full flex items-center gap-3 bg-card border border-primary/20 rounded-xl p-3 mb-4"
+        >
+          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <Calendar size={16} className="text-primary" />
+          </div>
+          <div className="flex-1 text-left">
+            <p className="text-sm font-semibold text-foreground">오늘 출석 안 했어요!</p>
+            <p className="text-[11px] text-muted-foreground">
+              {attendance.streak > 0 ? `${attendance.streak}일 연속 중 — 끊지 마세요!` : "출석하고 보상 받기"}
+            </p>
+          </div>
+          <ArrowRight size={14} className="text-muted-foreground" />
+        </motion.button>
+      )}
 
       {/* Overall */}
       <motion.div
@@ -24,6 +52,7 @@ const FortunePage = () => {
           <span className="text-primary-foreground font-extrabold text-2xl">{total}/25</span>
         </div>
         <p className="text-primary-foreground font-semibold">{overall}</p>
+        <p className="text-primary-foreground/60 text-xs mt-2">이 운세가 오늘의 행운 번호에 반영돼요 ✨</p>
       </motion.div>
 
       {/* Categories */}
@@ -56,6 +85,20 @@ const FortunePage = () => {
           </motion.div>
         ))}
       </div>
+
+      {/* CTA: Go to Lotto */}
+      <motion.button
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        whileTap={{ scale: 0.97 }}
+        onClick={() => onNavigate?.("lotto")}
+        className="w-full mt-5 py-4 gradient-gold rounded-2xl flex items-center justify-center gap-2 text-primary-foreground font-bold text-base"
+      >
+        <Ticket size={18} />
+        이 운세로 행운 번호 뽑기
+        <ArrowRight size={16} />
+      </motion.button>
     </div>
   );
 };
