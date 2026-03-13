@@ -113,6 +113,19 @@ const LottoPage = () => {
         )}
       </div>
 
+      {/* Native Ad after number reveal */}
+      {revealed && (
+        <div className="bg-card rounded-2xl p-4 mb-4 border border-border">
+          <div className="flex items-center gap-1 mb-2">
+            <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">AD</span>
+          </div>
+          <div className="gradient-gold-soft rounded-xl p-4 text-center">
+            <p className="text-sm font-medium text-secondary-foreground">🍀 행운을 나누면 두 배!</p>
+            <p className="text-xs text-muted-foreground mt-1">친구에게 공유하고 함께 당첨되세요</p>
+          </div>
+        </div>
+      )}
+
       {/* Bonus Numbers */}
       {revealed && !bonusNumbers && (
         <motion.div
