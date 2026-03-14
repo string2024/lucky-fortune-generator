@@ -14,16 +14,26 @@ type Tab = "fortune" | "lotto" | "attendance" | "saved";
 const Index = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [showInterstitial, setShowInterstitial] = useState(false);
+  const [pendingSave, setPendingSave] = useState<(() => void) | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("fortune");
   const { showAd: showTabAd, onTabSwitch, closeAd: closeTabAd } = useTabSwitchAd();
 
   const handleSplashDone = () => {
     setShowSplash(false);
+  };
+
+  // 저장 버튼 클릭 → 전면광고 → 저장 완료
+  const handleSaveWithAd = (saveFn: () => void) => {
+    setPendingSave(() => saveFn);
     setShowInterstitial(true);
   };
 
   const handleInterstitialClose = () => {
     setShowInterstitial(false);
+    if (pendingSave) {
+      pendingSave();
+      setPendingSave(null);
+    }
   };
 
   const handleTabChange = (tab: Tab) => {
@@ -39,7 +49,7 @@ const Index = () => {
 
   return (
     <div className="min-h-dvh flex flex-col bg-background">
-      {/* Initial Interstitial Ad */}
+      {/* Save Interstitial Ad */}
       <AnimatePresence>
         {showInterstitial && (
           <InterstitialAd onClose={handleInterstitialClose} />
@@ -63,7 +73,7 @@ const Index = () => {
           )}
           {activeTab === "lotto" && (
             <motion.div key="lotto" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
-              <LottoPage />
+              <LottoPage onSaveWithAd={handleSaveWithAd} />
             </motion.div>
           )}
           {activeTab === "attendance" && (

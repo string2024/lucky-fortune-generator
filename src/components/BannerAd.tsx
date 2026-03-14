@@ -13,7 +13,7 @@ const BannerAd = () => {
 
     const result = TossAds.attachBanner(AD_GROUP_ID, containerRef.current);
     return () => {
-      result?.detach?.();
+      result?.destroy?.();
     };
   }, []);
 

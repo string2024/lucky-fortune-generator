@@ -24,7 +24,11 @@ const LottoBall = ({ num, delay }: { num: number; delay: number }) => (
   </motion.div>
 );
 
-const LottoPage = () => {
+interface LottoPageProps {
+  onSaveWithAd?: (saveFn: () => void) => void;
+}
+
+const LottoPage = ({ onSaveWithAd }: LottoPageProps) => {
   const fortunes = getTodayFortune();
   const mainNumbers = generateLottoNumbers(fortunes);
   const [bonusNumbers, setBonusNumbers] = useState<number[] | null>(null);
@@ -78,8 +82,15 @@ const LottoPage = () => {
 
   const handleSave = (numbers: number[], type: "main" | "bonus") => {
     const today = new Date().toLocaleDateString("ko-KR");
-    saveNumbers({ numbers, date: today, type });
-    toast.success("번호가 저장되었어요!");
+    const doSave = () => {
+      saveNumbers({ numbers, date: today, type });
+      toast.success("번호가 저장되었어요!");
+    };
+    if (onSaveWithAd) {
+      onSaveWithAd(doSave);
+    } else {
+      doSave();
+    }
   };
 
   const handleShare = async (numbers: number[]) => {
