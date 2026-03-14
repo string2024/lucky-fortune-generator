@@ -4,9 +4,13 @@ import { getTodayFortune, generateLottoNumbers, generateBonusNumbers, getNumberC
 import { saveNumbers, shareNumbers } from "@/lib/storage";
 import { getFreeBonusCount, useFreeBonusToken } from "@/lib/attendance";
 import { Button } from "@toss/tds-mobile";
+import { loadFullScreenAd, showFullScreenAd } from "@apps-in-toss/web-bridge";
 
 import { Share2, Download, Gift, Ticket } from "lucide-react";
 import { toast } from "sonner";
+
+// 테스트 ID (출시 직전 실제 ID로 교체: ait.v2.live.6f0047c507dd40aa)
+const REWARD_AD_ID = "ait-ad-test-rewarded-id";
 
 const LottoBall = ({ num, delay }: { num: number; delay: number }) => (
   <motion.div
@@ -40,12 +44,36 @@ const LottoPage = () => {
   };
 
   const handleRewardAd = () => {
-    setShowRewardAd(true);
-    setTimeout(() => {
-      setShowRewardAd(false);
+    if (!loadFullScreenAd.isSupported?.()) {
+      // 토스 앱 환경이 아닐 때 fallback
       setBonusNumbers(generateBonusNumbers(fortunes));
       toast.success("보너스 번호가 생성되었어요!");
-    }, 2000);
+      return;
+    }
+
+    setShowRewardAd(true);
+    loadFullScreenAd({
+      options: { adGroupId: REWARD_AD_ID },
+      onEvent: () => {
+        showFullScreenAd({
+          options: { adGroupId: REWARD_AD_ID },
+          onEvent: (event) => {
+            if (event.type === "userEarnedReward") {
+              setBonusNumbers(generateBonusNumbers(fortunes));
+              toast.success("보너스 번호가 생성되었어요!");
+            }
+            if (event.type === "dismissed" || event.type === "failedToShow") {
+              setShowRewardAd(false);
+            }
+          },
+          onError: () => setShowRewardAd(false),
+        });
+      },
+      onError: () => {
+        setShowRewardAd(false);
+        toast.error("광고를 불러오지 못했어요. 잠시 후 다시 시도해주세요.");
+      },
+    });
   };
 
   const handleSave = (numbers: number[], type: "main" | "bonus") => {
